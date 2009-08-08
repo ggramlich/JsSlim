@@ -2,7 +2,9 @@ package slim;
 
 import java.lang.reflect.Proxy;
 
-public class JsBridge implements Bridge {
+import fitnesse.slim.Jsr232Bridge;
+
+public class JsBridge implements Jsr232Bridge {
 
   @Override
   public Proxy getStatementExecutor() throws Exception {
