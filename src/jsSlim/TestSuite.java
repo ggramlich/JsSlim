@@ -9,9 +9,9 @@ import org.junit.runners.Suite;
   {
     JsBridgeTest.class,
     JsSlimInstanceCreationTest.class,
-//    JsSlimMethodInvocationTest.class,
-//    JsListExecutorTest.class,
-//    JsSlimServiceTest.class
+    JsSlimMethodInvocationTest.class,
+    JsListExecutorTest.class,
+    JsSlimServiceTest.class
   }
 )
 public class TestSuite {

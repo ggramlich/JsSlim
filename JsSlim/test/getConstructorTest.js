@@ -4,7 +4,7 @@ var executor;
 
 testCases(test,
     function setUp() {
-        executor = getStatementExecutor(null);
+        executor = new JsSlim.StatementExecutor(null);
     },
     
     function noConstructorFound() {

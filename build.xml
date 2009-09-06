@@ -25,7 +25,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
     </scriptdef>
     
     <target name="run-unit-tests">
-        <rhinounit options="{verbose:true, stackTrace:true}" haltOnFirstFailure="true" rhinoUnitUtilPath="lib/rhinoUnitUtil.js">
+        <rhinounit options="{verbose:true, stackTrace:true}" haltOnFirstFailure="true" rhinoUnitUtilPath="lib/rhinoUnitUtil.js" ignoredglobalvars="List ArrayList String">
             <fileset dir="JsSlim/test">
                 <include name="*.js"/>
                 <exclude name="standard.js"/>
