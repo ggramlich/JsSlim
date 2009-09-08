@@ -7,6 +7,7 @@ import org.junit.runners.Suite;
 @RunWith(Suite.class)
 @Suite.SuiteClasses(
   {
+    JsClassLoaderTest.class,
     JsBridgeTest.class,
     JsSlimInstanceCreationTest.class,
     JsSlimMethodInvocationTest.class,

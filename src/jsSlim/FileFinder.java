@@ -21,4 +21,15 @@ public class FileFinder {
   public String getPathSeparator() {
     return File.pathSeparator;
   }
+
+  public char getDirSeparatorChar() {
+    return getDirSeparator().toCharArray()[0];
+  }
+
+  public String appendDirSeparator(String path) {
+    if (!path.endsWith(getDirSeparator())) {
+      return path + getDirSeparator();
+    }
+    return path;
+  }
 }

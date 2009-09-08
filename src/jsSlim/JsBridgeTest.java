@@ -20,7 +20,7 @@ public class JsBridgeTest {
   @BeforeClass
   public static void setUpClass() {
     // Creates Bridge only once
-    bridge = new JsBridge(getTestIncludePath());
+    bridge = new JsBridge();
   }
   
   @AfterClass
@@ -30,7 +30,7 @@ public class JsBridgeTest {
 
   @Test
   public void getInternalJavascriptPath() throws Exception {
-    File path = new File(bridge.getIncludePath());
+    File path = new File(getTestIncludePath());
     assertTrue(path.exists());
     assertTrue(path.isAbsolute());
     assertTrue(path.isDirectory());
@@ -54,6 +54,7 @@ public class JsBridgeTest {
 
   @Test
   public void getJsStatementExecutor() throws Exception {
+    bridge.setJsFileEvaluator(new JsFileEvaluator(getTestIncludePath(), new FileFinder(), bridge.getScriptEngine()));
     Object statementExecutor = bridge.getStatementExecutor();
     assertNotNull(statementExecutor);
     Invocable inv = (Invocable) bridge.getScriptEngine();

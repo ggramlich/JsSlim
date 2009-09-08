@@ -13,22 +13,24 @@ public class JsClassLoaderTest {
 
   private JsClassLoader loader;
   private FileFinderFake finder;
+  private JsFileEvaluator fileEvaluator;
   
   @Before
   public void setUp() throws Exception {
     finder = new FileFinderFake();
-    loader = new JsClassLoader("path:anotherpath/:parent/child", finder);
+    fileEvaluator = new JsFileEvaluator("path:anotherpath/:parent/child", finder, null);
+    loader = new JsClassLoader(fileEvaluator, finder);
   }
 
   @Test
   public void appendDirSeparator() {
-    assertEquals("x/", loader.appendDirSeparator("x"));
-    assertEquals("x/", loader.appendDirSeparator("x/"));
+    assertEquals("x/", finder.appendDirSeparator("x"));
+    assertEquals("x/", finder.appendDirSeparator("x/"));
   }
   
   @Test
   public void separatorsAreAsExpected() {
-    assertEquals(":", loader.getPathSeparator());
+    assertEquals(":", finder.getPathSeparator());
   }
   
   @Test
@@ -38,7 +40,7 @@ public class JsClassLoaderTest {
         "anotherpath/",
         "parent/child/"
     };
-    assertArrayEquals(paths, loader.getIncludePaths());
+    assertArrayEquals(paths, fileEvaluator.getIncludePaths());
   }
   
   @Test

@@ -1,24 +1,17 @@
 package jsSlim;
 
-import java.io.InputStream;
-import java.io.InputStreamReader;
-
 import javax.script.Invocable;
-import javax.script.ScriptEngine;
 
 import fitnesse.slim.Jsr223Bridge;
 import fitnesse.slim.VariableStore;
 
 public class JsBridge extends Jsr223Bridge {
-  private String includePath;
   private boolean isJsInitialized = false;
   private static final String ENGINE_NAME = "javascript";
   private static final String STATEMENT_EXECUTOR_FACTORY_FUNCTION = "getStatementExecutor";
   private static final String JS_SLIM_SCRIPT = "jsLib/JsSlim.js";
-
-  public JsBridge(String includePath) {
-    this.includePath = includePath;
-  }
+  private JsFileEvaluator jsFileEvaluator;
+  
 
   @Override
   public Object getStatementExecutor() throws Exception {
@@ -40,10 +33,6 @@ public class JsBridge extends Jsr223Bridge {
     return ENGINE_NAME;
   }
 
-  public String getIncludePath() {
-    return includePath;
-  }
-
   @Override
   public void close() {
   }
@@ -52,14 +41,15 @@ public class JsBridge extends Jsr223Bridge {
     if (isJsInitialized) {
       return;
     }
-    ScriptEngine engine = getScriptEngine();
-    engine.eval(getJsSlimScriptAsStreamReader());
+    this.jsFileEvaluator.evaluateFileResource(JS_SLIM_SCRIPT);
     isJsInitialized = true;
   }
 
-  private InputStreamReader getJsSlimScriptAsStreamReader() {
-    InputStream in = getClass().getResourceAsStream(JS_SLIM_SCRIPT);
-    return new InputStreamReader(in);
+  public JsFileEvaluator getJsFileEvaluator() {
+    return jsFileEvaluator;
   }
 
+  public void setJsFileEvaluator(JsFileEvaluator jsFileEvaluator) {
+    this.jsFileEvaluator = jsFileEvaluator;
+  }
 }

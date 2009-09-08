@@ -5,49 +5,25 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class JsClassLoader {
-  private String[] includePaths;
-  private FileFinder finder;
+  private JsFileEvaluator fileEvaluator;
   private Map<String, ArrayList<String>> classFiles = new HashMap<String, ArrayList<String>>();
+  private FileFinder fileFinder;
   
-  public JsClassLoader(String includePath, FileFinder finder) {
-    this.finder = finder;
-    this.setIncludePath(includePath);
-  }
-
-  private void setIncludePath(String includePath) {
-    String[] myIncludePaths = includePath.split(getPathSeparator());
-    includePaths = new String[myIncludePaths.length];
-    for (int i = 0; i < myIncludePaths.length; i++) {
-      String path = myIncludePaths[i];
-      includePaths[i] = appendDirSeparator(path);
-    }
+  public JsClassLoader(JsFileEvaluator fileEvaluator, FileFinder fileFinder) {
+    this.fileEvaluator = fileEvaluator;
+    this.fileFinder = fileFinder;
   }
 
   private boolean fileExists(String path) {
-    return finder.fileExists(path);
-  }
-  
-  String[] getIncludePaths() {
-    return includePaths;
+    return fileFinder.fileExists(path);
   }
 
-  public String appendDirSeparator(String path) {
-    if (!path.endsWith(getDirSeparator())) {
-      return path + getDirSeparator();
-    }
-    return path;
-  }
-
-  public String getDirSeparator() {
-    return finder.getDirSeparator();
+  private String[] getIncludePaths() {
+    return fileEvaluator.getIncludePaths();
   }
 
   private char getDirSeparatorChar() {
-    return getDirSeparator().toCharArray()[0];
-  }
-
-  public String getPathSeparator() {
-    return finder.getPathSeparator();
+    return fileFinder.getDirSeparatorChar();
   }
 
   public ArrayList<String> findClassFiles(String className) {
@@ -78,7 +54,7 @@ public class JsClassLoader {
     return className.replace('.', getDirSeparatorChar());
   }
 
-  public ArrayList<String> getPossiblePackageClassNames(String fullClassName) {
+  private ArrayList<String> getPossiblePackageClassNames(String fullClassName) {
     ArrayList<String> partialNames = new ArrayList<String>();
     String packageClass = "";
     for (String part: fullClassName.split("\\.")) {
@@ -94,7 +70,14 @@ public class JsClassLoader {
     return classNames;
   }
 
-  private void addToArrayListUnique(ArrayList<String> arrayList, String string) {
+  public void loadFilesForClassName(String fullClassName) throws Exception {
+    ArrayList<String> classFiles = findClassFiles(fullClassName);
+    for (String classFile: classFiles) {
+      fileEvaluator.loadAndEvaluateJsFile(classFile);
+    }
+  }
+  
+  private static void addToArrayListUnique(ArrayList<String> arrayList, String string) {
     if (!arrayList.contains(string)) {
       arrayList.add(string);
     }
@@ -116,11 +99,11 @@ public class JsClassLoader {
     return path.substring(1);
   }
 
-  private String ucFirst(String string) {
+  private static String ucFirst(String string) {
     return string.substring(0, 1).toUpperCase() + string.substring(1);
   }
 
-  private String lcFirst(String string) {
+  private static String lcFirst(String string) {
     return string.substring(0, 1).toLowerCase() + string.substring(1);
   }
 }
