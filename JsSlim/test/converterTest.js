@@ -1,4 +1,5 @@
 eval(loadFile("src/jsSlim/jsLib/JsSlim.js"));
+eval(loadFile("src/jsSlim/jsLib/JsSlim/Converter.js"));
 
 Array.prototype.toString = function () {
     return '[' + this.join(',') + ']';

@@ -9,14 +9,14 @@ public class JsBridge extends Jsr223Bridge {
   private boolean isJsInitialized = false;
   private static final String ENGINE_NAME = "javascript";
   private static final String STATEMENT_EXECUTOR_FACTORY_FUNCTION = "getStatementExecutor";
-  private static final String JS_SLIM_SCRIPT = "jsLib/JsSlim.js";
+  private static final String JS_SLIM_SCRIPT = "JsSlim.js";
   private JsFileEvaluator jsFileEvaluator;
   
 
   @Override
   public Object getStatementExecutor() throws Exception {
     initJsSlim();
-    return getInvocable().invokeFunction(STATEMENT_EXECUTOR_FACTORY_FUNCTION, new Object[]{new VariableStore()});
+    return getInvocable().invokeFunction(STATEMENT_EXECUTOR_FACTORY_FUNCTION, new Object[]{new VariableStore(), jsFileEvaluator});
   }
 
   public Invocable getInvocable() {
@@ -41,7 +41,7 @@ public class JsBridge extends Jsr223Bridge {
     if (isJsInitialized) {
       return;
     }
-    this.jsFileEvaluator.evaluateFileResource(JS_SLIM_SCRIPT);
+    jsFileEvaluator.evaluateFileResource(JS_SLIM_SCRIPT);
     isJsInitialized = true;
   }
 

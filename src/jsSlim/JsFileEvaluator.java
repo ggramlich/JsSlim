@@ -6,10 +6,10 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 
 import javax.script.ScriptEngine;
-import javax.script.ScriptException;
 
 public class JsFileEvaluator {
 
+  private final String JS_LIB = "jsLib";
   private ScriptEngine scriptEngine;
   private ArrayList<String> loadedFiles = new ArrayList<String>();
   private FileFinder finder;
@@ -21,22 +21,36 @@ public class JsFileEvaluator {
     this.scriptEngine = engine;
   }
 
-  public void evaluateFile(String jsFile) throws Exception {
-    ArrayList<String> absoluteFiles = getAbsoluteFiles(jsFile);
-    for (String absoluteFile: absoluteFiles) {
-      loadAndEvaluateJsFile(absoluteFile);
+  public boolean evaluateFile(String jsFile) {
+    try {
+      ArrayList<String> absoluteFiles = getAbsoluteFiles(jsFile);
+      for (String absoluteFile: absoluteFiles) {
+        loadAndEvaluateJsFile(absoluteFile);
+      }
+    } catch (Exception e) {
+      return false;
     }
+    return true;
   }
   
-  public void evaluateFileResource(String jsFile) throws ScriptException {
-    scriptEngine.eval(getJsFileAsStreamReader(jsFile));
+  public boolean evaluateFileResource(String jsFile) {
+    try {
+      scriptEngine.eval(getJsFileAsStreamReader(jsFile));
+    } catch (Exception e) {
+      return false;
+    }
+    return true;
   }
 
   private InputStreamReader getJsFileAsStreamReader(String jsFile) {
-    InputStream in = getClass().getResourceAsStream(jsFile);
+    InputStream in = getClass().getResourceAsStream(getResourceName(jsFile));
     return new InputStreamReader(in);
   }
 
+  private String getResourceName(String jsFile) {
+    return appendDirSeparator(JS_LIB) + jsFile;
+  }
+  
   public void loadAndEvaluateJsFile(String absoluteFile) throws Exception {
     if (!loadedFiles.contains(absoluteFile)) {
       scriptEngine.eval(new FileReader(absoluteFile));

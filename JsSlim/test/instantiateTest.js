@@ -1,4 +1,5 @@
 eval(loadFile("src/jsSlim/jsLib/JsSlim.js"));
+eval(loadFile("src/jsSlim/jsLib/JsSlim/StatementExecutor.js"));
 
 var executor;
 
