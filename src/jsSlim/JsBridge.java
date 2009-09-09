@@ -9,7 +9,7 @@ public class JsBridge extends Jsr223Bridge {
   private boolean isJsInitialized = false;
   private static final String ENGINE_NAME = "javascript";
   private static final String STATEMENT_EXECUTOR_FACTORY_FUNCTION = "getStatementExecutor";
-  private static final String JS_SLIM_SCRIPT = "JsSlim.js";
+  private static final String JS_SLIM_SCRIPT = "getStatementExecutor.js";
   private JsFileEvaluator jsFileEvaluator;
   
 

@@ -14,17 +14,23 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 
     <target name="run-all-tests" depends="run-unit-tests, run-js-lint"/>
 
-    <scriptdef name="rhinounit"
-              src="lib/rhinoUnitAnt.js"
-              language="javascript">
-        <attribute name="options"/>
-        <attribute name="ignoredglobalvars"/>
-        <attribute name="haltOnFirstFailure"/>
-        <attribute name="rhinoUnitUtilPath"/>
-        <element name="fileset" type="fileset"/>
-    </scriptdef>
+    <target name="build" depends="clean, compile" description="clean, then compile the source">
+      <copy todir="classes/slim/phplib">
+        <fileset file="src/slim/phplib/getPhpSlimProxy.php" />
+        <fileset file="src/slim/phplib/addOne.php" />
+      </copy>
+    </target>
+
+    <target name="clean">
+    </target>
     
-    <target name="run-unit-tests">
+    <target name="compile">
+    </target>
+
+    <target name="run-unit-tests" depends="run-js-tests">
+    </target>
+    
+    <target name="run-js-tests">
         <rhinounit options="{verbose:true, stackTrace:true}" haltOnFirstFailure="true" rhinoUnitUtilPath="lib/rhinoUnitUtil.js" ignoredglobalvars="List ArrayList String">
             <fileset dir="JsSlim/test">
                 <include name="*.js"/>
@@ -33,13 +39,6 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
         </rhinounit>
     </target>
     
-    <scriptdef name="jslintant"
-            src="lib/jslintant.js"
-            language="javascript">
-        <attribute name="options" />
-        <element name="fileset" type="fileset" />
-    </scriptdef>
-
     <target name="run-js-lint">
         <jslintant options="{eqeqeq : false, white: true, plusplus : false, bitwise : true, passfail: false, browser: true, evil: true, forin: true, newprimitive: true}">
             <fileset dir="src">
@@ -51,4 +50,21 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
         </jslintant>
     </target>
     
+    <scriptdef name="rhinounit"
+              src="lib/rhinoUnitAnt.js"
+              language="javascript">
+        <attribute name="options"/>
+        <attribute name="ignoredglobalvars"/>
+        <attribute name="haltOnFirstFailure"/>
+        <attribute name="rhinoUnitUtilPath"/>
+        <element name="fileset" type="fileset"/>
+    </scriptdef>
+    
+    <scriptdef name="jslintant"
+            src="lib/jslintant.js"
+            language="javascript">
+        <attribute name="options" />
+        <element name="fileset" type="fileset" />
+    </scriptdef>
+
 </project>

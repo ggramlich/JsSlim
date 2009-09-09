@@ -7,11 +7,15 @@ if ('undefined' === typeof window) {
 
 importClass(java.util.List);
 importClass(java.util.ArrayList);
-var JsSlim = {};
+
+var JsSlim;
+
 (function () {
-    JsSlim = {
+    var self = {
         EXCEPTION_TAG: "__EXCEPTION__:",
         EXCEPTION_STOP_TEST_TAG: "__EXCEPTION__:ABORT_SLIM_TEST:",
+        
+        _modules: ["Error", "StatementExecutor", "StatementExecutorProxy", "Converter"],
         
         setFileEvaluator: function (fileEvaluator) {
             self.fileEvaluator = fileEvaluator;
@@ -23,6 +27,16 @@ var JsSlim = {};
         
         loadJsFileResource: function (fileName) {
             return self.fileEvaluator.evaluateFileResource(fileName);
+        },
+        
+        loadModules: function () {
+            for (var i in self._modules) {
+                self.loadModule(self._modules[i]);
+            }
+        },
+        
+        loadModule: function (module) {
+            self.loadJsFileResource('JsSlim/' + module + '.js');
         },
         
         tagError: function (e) {
@@ -55,14 +69,6 @@ var JsSlim = {};
             return Child;
         }
     };
-    var self = JsSlim;
+    JsSlim = self;
 })();
 
-function getStatementExecutor(variables, fileEvaluator) {
-    JsSlim.setFileEvaluator(fileEvaluator);
-    JsSlim.loadJsFileResource('JsSlim/Error.js');
-    JsSlim.loadJsFileResource('JsSlim/StatementExecutor.js');
-    JsSlim.loadJsFileResource('JsSlim/StatementExecutorProxy.js');
-    JsSlim.loadJsFileResource('JsSlim/Converter.js');
-    return new JsSlim.StatementExecutorProxy(variables);
-}

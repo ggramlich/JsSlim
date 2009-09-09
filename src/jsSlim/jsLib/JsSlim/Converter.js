@@ -1,6 +1,6 @@
 (function () {
     // static class
-    var Converter = {
+    var self = {
         months: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
         
         toBool: function (value) {
@@ -143,6 +143,5 @@
             return list;
         }
     };
-    var self = Converter;
-    JsSlim.Converter = Converter;
+    JsSlim.Converter = self;
 })();

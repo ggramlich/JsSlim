@@ -60,9 +60,6 @@
         },
         
         call: function (instanceName, methodName, args) {
-            Array.prototype.toString = function () {
-                return '[' + this.join(',') + ']';
-            };
             args = JsSlim.Converter.toArray(args);
             var result = this.executor.call(instanceName, methodName, args);
             javaResult = JsSlim.Converter.toJavaString(result);
