@@ -12,24 +12,73 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 -->
 <project name="" basedir="." default="run-all-tests">
 
+    <path id="classpath">
+      <pathelement path="classes"/>
+      <fileset dir="lib">
+        <include name="*.jar"/>
+      </fileset>
+    </path>
+
     <target name="run-all-tests" depends="run-unit-tests, run-js-lint"/>
 
     <target name="build" depends="clean, compile" description="clean, then compile the source">
-      <copy todir="classes/slim/phplib">
-        <fileset file="src/slim/phplib/getPhpSlimProxy.php" />
-        <fileset file="src/slim/phplib/addOne.php" />
+      <copy todir="classes/jsSlim/jsLib">
+        <fileset dir="src/jsSlim/jsLib" />
       </copy>
     </target>
 
     <target name="clean">
+        <delete dir="classes"/>
+        <mkdir dir="classes"/>
+        <delete dir="test-results"/>
+        <mkdir dir="test-results"/>
     </target>
     
-    <target name="compile">
+    <target name="compile" depends="clean" description="compile the source (make)">
+      <javac srcdir="src" destdir="classes" classpathref="classpath" debug="true">
+      </javac>
     </target>
 
-    <target name="run-unit-tests" depends="run-js-tests">
+    <target name="jar" depends="build" description="generate the jar file">
+      <mkdir dir="dist"/>
+      <delete file="dist/jsSlim.jar"/>
+
+      <jar jarfile="dist/jsSlim.jar" basedir="classes">
+        <exclude name = "**/*Test.class"/>
+        <exclude name = "**/TestSuite.class"/>
+        <exclude name = "**/testModule/**"/>
+        <include name="**/*.class"/>
+        <include name="jsSlim/jsLib/**/*.js" />
+        <exclude name = "jsSlim/jsLib/addOne.js"/>
+        <zipfileset src="lib/fitnesse.jar">
+          <exclude name = "**/*TestBase.class"/>
+          <include name="fitnesse/slim/*.class"/>
+          <include name="fitnesse/socketservice/*.class"/>
+          <include name="util/*.class"/>
+        </zipfileset>
+        <manifest>
+          <attribute name="Built-By" value="Gregor Gramlich."/>
+          <attribute name="Main-Class" value="jsSlim.JsSlimService"/>
+        </manifest>
+      </jar>
     </target>
-    
+
+    <target name="run-unit-tests" depends="run-js-tests, unit_test">
+    </target>
+
+    <target name="unit_test" depends="build" description="run the unit tests">
+      <junit forkmode="once" fork="yes" printsummary="no" haltonfailure="yes" haltonerror="yes" dir="${basedir}">
+        <classpath refid="classpath"/>
+        <formatter type="xml" usefile="true"/>
+        <formatter type="plain" usefile="false"/>
+        <batchtest todir="test-results">
+          <fileset dir="src">
+            <include name="**/*Test.java"/>
+          </fileset>
+        </batchtest>
+      </junit>
+    </target>
+
     <target name="run-js-tests">
         <rhinounit options="{verbose:true, stackTrace:true}" haltOnFirstFailure="true" rhinoUnitUtilPath="lib/rhinoUnitUtil.js" ignoredglobalvars="List ArrayList String">
             <fileset dir="JsSlim/test">
