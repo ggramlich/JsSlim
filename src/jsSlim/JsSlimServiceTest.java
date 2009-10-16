@@ -5,7 +5,7 @@ import fitnesse.slim.SlimServiceTestBase;
 
 public class JsSlimServiceTest extends SlimServiceTestBase {
   protected void startSlimService() throws Exception {
-    JsSlimService.main(new String[]{getTestIncludePath(), "8099"});
+    JsSlimService.main(new String[]{"-i", getTestIncludePath(), "8099"});
   }
   
   protected String getImport() {
