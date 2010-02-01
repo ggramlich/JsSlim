@@ -12,7 +12,8 @@ import org.junit.runners.Suite;
     JsSlimInstanceCreationTest.class,
     JsSlimMethodInvocationTest.class,
     JsListExecutorTest.class,
-    JsSlimServiceTest.class
+    JsSlimServiceTest.class,
+    JsStatementExecutorTest.class
   }
 )
 public class TestSuite {

@@ -1,11 +1,19 @@
 eval(loadFile("src/jsSlim/jsLib/JsSlim.js"));
+eval(loadFile("src/jsSlim/jsLib/JsSlim/Error.js"));
 eval(loadFile("src/jsSlim/jsLib/JsSlim/StatementExecutor.js"));
+var TestModule = {SystemUnderTest: {}};
+eval(loadFile('JsSlim/TestModule/SystemUnderTest/MyAnnotatedSystemUnderTestFixture.js'));
 
 var executor;
 
 testCases(test,
     function setUp() {
         executor = new JsSlim.StatementExecutor(null);
+        executor._variables = {
+            replaceVariables: function (args) {
+                return args;
+            }
+        };
     },
     
     function simpleObjectGivesSimpleObject() {
@@ -154,6 +162,19 @@ testCases(test,
     function getArgCountForConstructor() {
         function Constructor(a, b, c, d) {}
         assert.that(executor.getArgCount(Constructor), eq(4));
+    },
+    
+    function callOnSystemUnderTest() {
+        executor.setGlobal({TestModule: TestModule});
+        executor.addPath("TestModule.SystemUnderTest");
+        var created = executor.create("myInstance", "MyAnnotatedSystemUnderTestFixture", []);
+        assert.that(created, eq("OK"));
+        var anno = executor.getInstance("myInstance");
+        var sut = anno.getSystemUnderTest();
+        assert.that(sut.speakCalled(), eq(false));
+        var result = executor.call("myInstance", "speak", []);
+        assert.that(result, eq(undefined));
+        assert.that(sut.speakCalled(), eq(true));
     }
 );
 

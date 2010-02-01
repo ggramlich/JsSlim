@@ -7,8 +7,14 @@
         init: function (variables) {
             this._variables = variables;
             this._instances = {instances: {}, constructors: {}};
+            this._libraries = [];
             this._paths = [];
             this._stopRequested = false;
+            this._global = window;
+        },
+        
+        setGlobal: function (global) {
+            this._global = global;
         },
         
         setVariable: function (name, value) {
@@ -21,9 +27,12 @@
         
         create: function (instanceName, className, constructorArguments) {
             try {
-                instance = this.constructInstance(
+                var instance = this.constructInstance(
                     className, this.replaceVariables(constructorArguments)
                 );
+                if (this.isLibraryName(instanceName)) {
+                    this._libraries.unshift(instance);
+                }
                 this.putInstance(instanceName, instance, className);
                 return 'OK';
             } catch (e) {
@@ -32,6 +41,10 @@
                 }
                 return this.exceptionToString(e);
             }
+        },
+        
+        isLibraryName: function (instanceName) {
+            return 'library' === instanceName.substr(0, 'library'.length);
         },
         
         addPath: function (path) {
@@ -53,14 +66,70 @@
         call: function (instanceName, methodName, args) {
             try {
                 args = this.replaceVariables(args);
-                instance = this.getInstance(instanceName);
-                if ('function' !== typeof instance[methodName]) {
-                    throw new JsSlim.Error('NO_METHOD_IN_CLASS ' + methodName + '[' + args.length + '] ' + this.getClassName(instanceName) + '.');
-                }
-                return instance[methodName].apply(instance, args);
+                var callback = this.getCallback(instanceName, methodName, args);
+                return callback.apply(args);
             } catch (e) {
                 return this.exceptionToString(e);
             }
+        },
+        
+        createCallback: function (instance, method) {
+            return new JsSlim.Callback(instance, method);
+        },
+        
+        createCallbackFromMethodName: function (instance, methodName) {
+            var method;
+            if (undefined === instance) {
+                method = undefined;
+            } else {
+                method = instance[methodName];
+            }
+            return this.createCallback(instance, method);
+        },
+        
+        getCallback: function (instanceName, methodName, args) {
+            var instance = this.getInstance(instanceName);
+            var callback = this.createCallbackFromMethodName(instance, methodName);
+            if ('function' !== typeof callback.method) {
+                callback = this.getCallbackFromSystemUnderTest(instance, methodName);
+            }
+            if ('function' !== typeof callback.method) {
+                callback = this.getCallbackFromLibrary(methodName);
+            }
+            if ('function' === typeof callback.method) {
+                return callback;
+            }
+            if (undefined === instance) {
+                throw new JsSlim.Error('NO_INSTANCE ' + instanceName + '.');
+            }
+            throw new JsSlim.Error('NO_METHOD_IN_CLASS ' + methodName + '[' + args.length + '] ' + this.getClassName(instanceName) + '.');
+        },
+        
+        getCallbackFromSystemUnderTest: function (instance, methodName) {
+            var systemUnderTest = this.getSystemUnderTestFromInstance(instance);
+            return this.createCallbackFromMethodName(systemUnderTest, methodName);
+        },
+        
+        getSystemUnderTestFromInstance: function (instance) {
+            if (undefined === instance) {
+                return;
+            }
+            if ('function' === typeof instance.sut) {
+                return instance.sut.apply(instance);
+            }
+            if (undefined !== instance.systemUnderTest) {
+                return instance.systemUnderTest;
+            }
+        },
+        
+        getCallbackFromLibrary: function (methodName) {
+            for (var key in this._libraries) {
+                var instance = this._libraries[key];
+                if ('function' === typeof instance[methodName]) {
+                    return this.createCallbackFromMethodName(instance, methodName);
+                }
+            }
+            return this.createCallbackFromMethodName();
         },
         
         exceptionToString: function (e) {
@@ -136,11 +205,7 @@
         },
         
         getInstance: function (instanceName) {
-            instance = this._instances.instances[instanceName];
-            if (undefined === instance) {
-                throw new JsSlim.Error('NO_INSTANCE ' + instanceName + '.');
-            }
-            return instance;
+            return this._instances.instances[instanceName];
         },
         
         getClassName: function (instanceName) {
@@ -149,7 +214,7 @@
         
         getFirstConstructorFromPath: function (className, global) {
             if (undefined === global) {
-                global = window;
+                global = this._global;
             }
             var Constructor = this.getConstructor(className, global);
             if (null !== Constructor) {
@@ -197,4 +262,13 @@
         }
     };
     JsSlim.StatementExecutor = StatementExecutor;
+
+    JsSlim.Callback = function (instance, method) {
+        this.instance = instance;
+        this.method = method;
+        this.apply = function (args) {
+            return this.method.apply(this.instance, args);
+        };
+    };
+
 })();
