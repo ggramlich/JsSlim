@@ -137,10 +137,102 @@
         
         toJavaListString: function (array) {
             var list = new java.util.ArrayList();
-            for (var i in array) {
+            for (var i = 0; i < array.length; i++) {
                 list.add(self.toJavaString(array[i]));
             }
             return list;
+        },
+        
+        hashListToPairsList: function (hashes) {
+            var list = [];
+            for (var i = 0; i < hashes.length; i++) {
+                list.push(self.hashToPairs(hashes[i]));
+            }
+            return list;
+        },
+        
+        hashToPairs: function (hash) {
+            var list = [];
+            for (var prop in hash) {
+                if (hash.hasOwnProperty(prop)) {
+                    list.push([prop, hash[prop]]);
+                }
+            }
+            return list;
+        },
+        
+        htmlTableToHash: function (html) {
+            // This is ugly, but we cannot rely on HTML browser support.
+            var inner = this._extractTableInner(String(html));
+            if (undefined === inner || '' === inner) {
+                return;
+            }
+            return this._htmlRowsToHash(inner);
+        },
+        
+        _extractTableInner: function (html) {
+            var extracted = this._extractInner('table', html);
+            if (undefined === extracted || '' !== extracted.rest) {
+                return;
+            }
+            return extracted.inner;
+        },
+        
+        _htmlRowsToHash: function (inner) {
+            var rows = this._getRows(inner);
+            if (undefined === rows) {
+                return;
+            }
+            var hash = {};
+            for (var i = 0; i < rows.length; i++) {
+                var row = this._getCells(rows[i]);
+                if (2 != row.length) {
+                    return;
+                }
+                hash[row[0]] = row[1];
+            }
+            return hash;
+        },
+        
+        _getRows: function (tableInner) {
+            return this._tagsToArray('tr', tableInner);
+        },
+        
+        _getCells: function (rowInner) {
+            return this._tagsToArray('td', rowInner);
+        },
+        
+        _tagsToArray: function (tag, string) {
+            var array = [];
+            while ('' !== string) {
+                var extracted = this._extractInner(tag, string);
+                if (undefined === extracted) {
+                    return;
+                }
+                array.push(extracted.inner);
+                string = extracted.rest;
+            }
+            return array;
+        },
+        
+        _extractInner: function (tag, string) {
+            var openTag = '<' + tag + '>';
+            var closeTag = '</' + tag + '>';
+            try {
+                var start = string.indexOf(openTag);
+                var end = string.indexOf(closeTag);
+            } catch (e) {
+                print(string);
+                print(e);
+            }
+            if (-1 == start || -1 == end) {
+                return;
+            }
+            return {inner: this._trim(string.substring(start + openTag.length, end)), rest: this._trim(string.substr(end + closeTag.length))};
+        },
+        
+        _trim: function (string) {
+            return string.replace(/^\s+/, '').replace(/\s+$/, '');
         }
     };
     JsSlim.Converter = self;

@@ -109,5 +109,61 @@ testCases(test,
         assert.that(array.equals(innerArray), isFalse());
         assert.that(array.equals(result), isTrue());
         assert.that(innerArray.equals(result), isFalse());
+    },
+    
+    function testHtmlTableToHash() {
+        function objectsEqual(first, second) {
+            if (first == second) {
+                return true;
+            }
+            if (undefined === first || undefined === second) {
+                return false;
+            }
+            var key;
+            for (key in first) {
+                if (first[key] != second[key]) {
+                    return false;
+                }
+            }
+            for (key in second) {
+                if (first[key] != second[key]) {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        function assertHtmlTableConvertsToHash(expected, html) {
+            var converted = JsSlim.Converter.htmlTableToHash(html);
+            assert.that(objectsEqual(expected, converted), isTrue());
+        }
+        
+        // More tests are in JsHashWidgetConversionTest.java
+        assertHtmlTableConvertsToHash(undefined, '');
+
+        assertHtmlTableConvertsToHash(undefined, "<table></table>");
+
+        var html = " <table>" +
+            " <tr>  <td>name</td>  <td>Bob</td> </tr>" +
+            "<tr>  <td>address</td>  <td>here</td> </tr> " +
+            "</table> ";
+        var expected = {"name": "Bob", "address": "here"};
+        assertHtmlTableConvertsToHash(expected, html);
+    },
+    
+    function testHashToPairs() {
+        var expected = [];
+        assert.that(expected.equals(JsSlim.Converter.hashToPairs({})), isTrue());
+        
+        expected = [['a', 'b']];
+        assert.that(expected.equals(JsSlim.Converter.hashToPairs({'a': 'b'})), isTrue());
+        
+        expected = [['a', 'b'], ['c', 'd']];
+        assert.that(expected.equals(JsSlim.Converter.hashToPairs({'a': 'b', 'c': 'd'})), isTrue());
+    },
+    
+    function testHashListToPairsList() {
+        var list = [JsSlim.Converter.hashToPairs({'a': 'b'}), JsSlim.Converter.hashToPairs({'c': 'd'})];
+        assert.that(list.equals(JsSlim.Converter.hashListToPairsList([{'a': 'b'}, {'c': 'd'}])), isTrue());
     }
 );

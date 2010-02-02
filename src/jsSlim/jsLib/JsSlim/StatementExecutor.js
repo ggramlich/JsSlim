@@ -25,11 +25,26 @@
             return this._variables.replaceVariables(args);
         },
         
+        convertHashTableInArguments: function (args) {
+            for (var i = 0; i < args.length; i++) {
+                var hash = JsSlim.Converter.htmlTableToHash(args[i]);
+                if (undefined !== hash) {
+                    args[i] = hash;
+                } else {
+                    // Remove side effects from java.lang.String
+                    if (args[i] instanceof String) {
+                        args[i] = String(args[i]);
+                    }
+                }
+            }
+            return args;
+        },
+        
         create: function (instanceName, className, constructorArguments) {
             try {
-                var instance = this.constructInstance(
-                    className, this.replaceVariables(constructorArguments)
-                );
+                constructorArguments = this.replaceVariables(constructorArguments);
+                constructorArguments = this.convertHashTableInArguments(constructorArguments);
+                var instance = this.constructInstance(className, constructorArguments);
                 if (this.isLibraryName(instanceName)) {
                     this._libraries.unshift(instance);
                 }
@@ -66,6 +81,7 @@
         call: function (instanceName, methodName, args) {
             try {
                 args = this.replaceVariables(args);
+                args = this.convertHashTableInArguments(args);
                 var callback = this.getCallback(instanceName, methodName, args);
                 return callback.apply(args);
             } catch (e) {

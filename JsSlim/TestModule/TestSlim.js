@@ -1,7 +1,3 @@
-if ('undefined' == typeof TestModule) {
-    TestModule = {};
-}
-
 (function () {
     function TestSlim(x) {
         this.init(x);

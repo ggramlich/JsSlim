@@ -1,4 +1,5 @@
 eval(loadFile("src/jsSlim/jsLib/JsSlim.js"));
+eval(loadFile("src/jsSlim/jsLib/JsSlim/Converter.js"));
 eval(loadFile("src/jsSlim/jsLib/JsSlim/Error.js"));
 eval(loadFile("src/jsSlim/jsLib/JsSlim/StatementExecutor.js"));
 var TestModule = {SystemUnderTest: {}};
@@ -162,6 +163,16 @@ testCases(test,
     function getArgCountForConstructor() {
         function Constructor(a, b, c, d) {}
         assert.that(executor.getArgCount(Constructor), eq(4));
+    },
+    
+    function createWithNormalConstructor() {
+        executor.setGlobal({TestModule: TestModule});
+        executor.addPath("TestModule");
+        eval(loadFile('JsSlim/TestModule/NormalConstructor.js'));
+        var created = executor.create("myInstance", "NormalConstructor", ['x']);
+        assert.that(created, eq("OK"));
+        var instance = executor.getInstance("myInstance");
+        assert.that(instance.getValue(), eq('x'));
     },
     
     function callOnSystemUnderTest() {
