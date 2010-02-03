@@ -1,12 +1,12 @@
 package jsSlim;
 
 import fitnesse.slim.Jsr223Bridge;
+import fitnesse.slim.Jsr223SlimFactory;
 import fitnesse.slim.NameTranslator;
 import fitnesse.slim.NameTranslatorIdentity;
-import fitnesse.slim.SlimFactory;
 import fitnesse.slim.StatementExecutorInterface;
 
-public class JsSlimFactory extends SlimFactory {
+public class JsSlimFactory extends Jsr223SlimFactory {
   private static JsBridge jsBridge;
   private String includePath;
   private FileFinder fileFinder;
