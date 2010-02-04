@@ -82,38 +82,33 @@
             try {
                 args = this.replaceVariables(args);
                 args = this.convertHashTableInArguments(args);
-                var callback = this.getCallback(instanceName, methodName, args);
-                return callback.apply(args);
+                var closure = this.getClosure(instanceName, methodName, args);
+                return closure(args);
             } catch (e) {
                 return this.exceptionToString(e);
             }
         },
         
-        createCallback: function (instance, method) {
-            return new JsSlim.Callback(instance, method);
-        },
-        
-        createCallbackFromMethodName: function (instance, methodName) {
-            var method;
-            if (undefined === instance) {
-                method = undefined;
-            } else {
-                method = instance[methodName];
+        createClosureFromMethodName: function (instance, methodName) {
+            if (undefined === instance || undefined === instance[methodName]) {
+                return;
             }
-            return this.createCallback(instance, method);
+            return function (args) {
+                instance[methodName].apply(instance, args);
+            };
         },
         
-        getCallback: function (instanceName, methodName, args) {
+        getClosure: function (instanceName, methodName, args) {
             var instance = this.getInstance(instanceName);
-            var callback = this.createCallbackFromMethodName(instance, methodName);
-            if ('function' !== typeof callback.method) {
-                callback = this.getCallbackFromSystemUnderTest(instance, methodName);
+            var closure = this.createClosureFromMethodName(instance, methodName);
+            if ('function' !== typeof closure) {
+                closure = this.getClosureFromSystemUnderTest(instance, methodName);
             }
-            if ('function' !== typeof callback.method) {
-                callback = this.getCallbackFromLibrary(methodName);
+            if ('function' !== typeof closure) {
+                closure = this.getClosureFromLibrary(methodName);
             }
-            if ('function' === typeof callback.method) {
-                return callback;
+            if ('function' === typeof closure) {
+                return closure;
             }
             if (undefined === instance) {
                 throw new JsSlim.Error('NO_INSTANCE ' + instanceName + '.');
@@ -121,9 +116,9 @@
             throw new JsSlim.Error('NO_METHOD_IN_CLASS ' + methodName + '[' + args.length + '] ' + this.getClassName(instanceName) + '.');
         },
         
-        getCallbackFromSystemUnderTest: function (instance, methodName) {
+        getClosureFromSystemUnderTest: function (instance, methodName) {
             var systemUnderTest = this.getSystemUnderTestFromInstance(instance);
-            return this.createCallbackFromMethodName(systemUnderTest, methodName);
+            return this.createClosureFromMethodName(systemUnderTest, methodName);
         },
         
         getSystemUnderTestFromInstance: function (instance) {
@@ -138,14 +133,13 @@
             }
         },
         
-        getCallbackFromLibrary: function (methodName) {
+        getClosureFromLibrary: function (methodName) {
             for (var key in this._libraries) {
                 var instance = this._libraries[key];
                 if ('function' === typeof instance[methodName]) {
-                    return this.createCallbackFromMethodName(instance, methodName);
+                    return this.createClosureFromMethodName(instance, methodName);
                 }
             }
-            return this.createCallbackFromMethodName();
         },
         
         exceptionToString: function (e) {
@@ -278,13 +272,4 @@
         }
     };
     JsSlim.StatementExecutor = StatementExecutor;
-
-    JsSlim.Callback = function (instance, method) {
-        this.instance = instance;
-        this.method = method;
-        this.apply = function (args) {
-            return this.method.apply(this.instance, args);
-        };
-    };
-
 })();
