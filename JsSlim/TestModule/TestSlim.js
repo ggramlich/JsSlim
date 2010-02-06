@@ -61,7 +61,7 @@
         },
         
         oneDate: function (value) {
-            this.value = JsSlim.Converter.toDate(value);
+            this.value = JsSlim.Converter.dateToString(JsSlim.Converter.toDate(value));
         },
         
         oneList: function (value) {

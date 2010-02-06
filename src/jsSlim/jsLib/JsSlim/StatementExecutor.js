@@ -83,7 +83,9 @@
                 args = this.replaceVariables(args);
                 args = this.convertHashTableInArguments(args);
                 var callback = this.getCallback(instanceName, methodName, args);
-                return callback.apply(args);
+                // Under Windows, error is not caught if method invocation is returned directly.
+                var result = callback.apply(args);
+                return result;
             } catch (e) {
                 return this.exceptionToString(e);
             }

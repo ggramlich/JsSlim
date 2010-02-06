@@ -153,12 +153,22 @@
         
         hashToPairs: function (hash) {
             var list = [];
-            for (var prop in hash) {
-                if (hash.hasOwnProperty(prop)) {
-                    list.push([prop, hash[prop]]);
-                }
+            var properties = self.getSortedProperties(hash);
+            for (var i = 0; i < properties.length; i++) {
+                var prop = properties[i];
+                list.push([prop, hash[prop]]);
             }
             return list;
+        },
+        
+        getSortedProperties: function (hash) {
+            var properties = [];
+            for (var prop in hash) {
+                if (hash.hasOwnProperty(prop)) {
+                    properties.push(prop);
+                }
+            }
+            return properties.sort();
         },
         
         htmlTableToHash: function (html) {
