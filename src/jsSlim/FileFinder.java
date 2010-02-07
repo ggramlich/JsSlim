@@ -15,7 +15,7 @@ public class FileFinder {
   }
   
   public String getDirSeparator() {
-    return File.separator;
+    return "/";
   }
 
   public String getPathSeparator() {
