@@ -3,7 +3,6 @@ package jsSlim;
 import javax.script.Invocable;
 
 import fitnesse.slim.Jsr223Bridge;
-import fitnesse.slim.VariableStore;
 
 public class JsBridge extends Jsr223Bridge {
   private boolean isJsInitialized = false;
@@ -16,7 +15,7 @@ public class JsBridge extends Jsr223Bridge {
   @Override
   public Object getStatementExecutor() throws Exception {
     initJsSlim();
-    return getInvocable().invokeFunction(STATEMENT_EXECUTOR_FACTORY_FUNCTION, new Object[]{new VariableStore(), jsFileEvaluator});
+    return getInvocable().invokeFunction(STATEMENT_EXECUTOR_FACTORY_FUNCTION, new Object[]{new VariableStoreAdapter(), jsFileEvaluator});
   }
 
   public Invocable getInvocable() {
