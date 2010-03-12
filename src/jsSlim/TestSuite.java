@@ -12,9 +12,9 @@ import org.junit.runners.Suite;
     JsSlimInstanceCreationTest.class,
     JsSlimMethodInvocationTest.class,
     JsListExecutorTest.class,
-    JsSlimServiceTest.class,
     JsStatementExecutorTest.class,
-    JsHashWidgetConversionTest.class
+    JsHashWidgetConversionTest.class,
+    JsSlimServiceTest.class
   }
 )
 public class TestSuite {
