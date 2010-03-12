@@ -34,7 +34,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
         <mkdir dir="test-results"/>
     </target>
     
-    <target name="compile" depends="clean" description="compile the source (make)">
+    <target name="compile" depends="clean, build-fitnesse" description="compile the source (make)">
       <javac srcdir="src" destdir="classes" classpathref="classpath" debug="true">
       </javac>
     </target>
@@ -115,5 +115,18 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
         <attribute name="options" />
         <element name="fileset" type="fileset" />
     </scriptdef>
+
+    <target name="build-fitnesse">
+        <!--
+            ant and subant tasks do not work,
+            they stops with an error on createUpdateList
+        -->
+        <exec executable="ant" dir="../fitnesse">
+            <arg value="jar"/>
+        </exec>
+        <copy todir="lib">
+            <fileset dir="../fitnesse/dist" />
+        </copy>
+    </target>
 
 </project>

@@ -3,4 +3,6 @@ bin
 classes
 dist
 test-results
+lib/fitnesse.jar
+*~
 
