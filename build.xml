@@ -10,11 +10,15 @@ Redistribution and use in source and binary forms, with or without modification,
 
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 -->
-<project name="" basedir="." default="run-all-tests">
+<project name="JsSlim" basedir="." default="run-all-tests">
+
+    <import file="fitnesse-build.xml" />
+    <property name="libdir" value="lib"/>
 
     <path id="classpath">
       <pathelement path="classes"/>
-      <fileset dir="lib">
+      <fileset dir="${libdir}">
+        <include name="junit-4.8.1.jar" />
         <include name="*.jar"/>
       </fileset>
     </path>
@@ -34,7 +38,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
         <mkdir dir="test-results"/>
     </target>
     
-    <target name="compile" depends="clean, build-fitnesse" description="compile the source (make)">
+    <target name="compile" depends="clean, get-fitnesse-jar" description="compile the source (make)">
       <javac srcdir="src" destdir="classes" classpathref="classpath" debug="true">
       </javac>
     </target>
@@ -50,7 +54,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
         <include name="**/*.class"/>
         <include name="jsSlim/jsLib/**/*.js" />
         <exclude name = "jsSlim/jsLib/addOne.js"/>
-        <zipfileset src="lib/fitnesse.jar">
+        <zipfileset src="${libdir}/fitnesse.jar">
           <exclude name = "**/*TestBase.class"/>
           <include name="fitnesse/slim/*.class"/>
           <include name="fitnesse/socketservice/*.class"/>
@@ -115,18 +119,5 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
         <attribute name="options" />
         <element name="fileset" type="fileset" />
     </scriptdef>
-
-    <target name="build-fitnesse">
-        <!--
-            ant and subant tasks do not work,
-            they stops with an error on createUpdateList
-        -->
-        <exec executable="ant" dir="../fitnesse">
-            <arg value="jar"/>
-        </exec>
-        <copy todir="lib">
-            <fileset dir="../fitnesse/dist" />
-        </copy>
-    </target>
 
 </project>
