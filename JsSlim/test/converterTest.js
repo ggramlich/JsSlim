@@ -15,6 +15,13 @@ Array.prototype.equals = function (other) {
 testCases(test,
     function setUp() { },
 
+    function testFloatConversion() {
+        assert.that(JsSlim.Converter.toString(0.001), eq('0.001'));
+        assert.that(JsSlim.Converter.floatToString(0.00001), eq('1e-5'));
+        assert.that(JsSlim.Converter.toString(0.00001), eq('1e-5'));
+        assert.that(JsSlim.Converter.toString(1e14), eq('1e+14'));
+    },
+    
     function testDateConverts() {
         var date = JsSlim.Converter.toDate('5-Sep-2009');
         assert.that(date, isA(Date));

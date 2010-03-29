@@ -90,6 +90,9 @@
             if (undefined === value) {
                 return '/__VOID__/';
             }
+            if ('number' == typeof value) {
+                return self.numberToString(value);
+            }
             if (value instanceof Date) {
                 return self.dateToString(value);
             }
@@ -97,6 +100,23 @@
                 return '[' + value.join(', ') + ']';
             }
             return "" + value;
+        },
+        
+        numberToString: function (number) {
+            if ((number !== 0) && (Math.abs(number) < 0.0001)) {
+                number = number.toExponential();
+            }
+            if (Math.abs(number) >= 1e14) {
+                number = number.toExponential();
+            }
+            return "" + number;
+        },
+        
+        floatToString: function (number) {
+            if ((number == Math.round(number)) && (Math.abs(number) < 1e14)) {
+                return number.toFixed(1);
+            }
+            return self.numberToString(number);
         },
         
         dateToString: function (date) {
