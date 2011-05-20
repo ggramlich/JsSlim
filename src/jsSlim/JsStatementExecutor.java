@@ -43,4 +43,12 @@ public class JsStatementExecutor extends Jsr223StatementExecutor {
       loader.loadFilesForClassName(fullClassName);
     }
   }
+
+  @Override
+  public Object callAndAssign(String variable, String instanceName,
+      String methodName, Object[] args) {
+    Object result = call(instanceName, methodName, args);
+    setVariable(variable, result);
+    return result;
+  }
 }
