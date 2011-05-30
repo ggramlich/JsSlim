@@ -22,13 +22,20 @@ public class JsSlimService extends SlimService {
       if (commandLine.hasOption("i")) {
         includePath = commandLine.getOptionArgument("i", "includepath");
       } else {
-          includePath = System.getProperty("java.class.path");
+        includePath = System.getProperty("java.class.path");
       }
-      String portString = commandLine.getArgument("port");
-      port = Integer.parseInt(portString);
-      return true;
+      return determinePort(commandLine.getArgument("port"));
     }
     return false;
+  }
+
+  protected static boolean determinePort(String portString) {
+    try {
+      port = Integer.parseInt(portString);
+      return true;
+    } catch (NumberFormatException exception) {
+      return false;
+    }
   }
 
   public JsSlimService(int port, SlimServer slimServer) throws Exception {
